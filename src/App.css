@@ -1,38 +1,89 @@
-.App {
-  text-align: center;
+.main {
+  background: #fcfcfc;
+  height: 100vh;
+  width: 100vw;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.container {
   display: flex;
-  flex-direction: column;
+  height: 100%;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.dots {
+  height: 40px;
+  width: 40px;
+  background: #4c4c4c;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.align-item-center {
+  align-items: center;
+}
+
+.line-h-wrapper {
+  width: 60px;
+  margin: 0 4px;
+}
+
+.line-h {
+  height: 8px;
+  background: #c1c1c1;
+  width: 0;
+  border-radius: 4px;
+}
+
+.line-v-wrapper {
+  height: 60px;
+  margin: 4px 16px;
+}
+
+.line-v {
+  height: 0px;
+  background: #c1c1c1;
+  width: 8px;
+  border-radius: 4px;
+}
+
+.line-v-0 {
+  height: 0px;
+  background: none;
+  width: 8px;
+  border-radius: 4px;
+}
+
+.box {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  width: 80px;
+  left: 32px;
+  top: -8px;
+}
+
+.rel {
+  position: relative;
+}
+
+.z-x {
+  z-index: 8;
+}
+
+.icon {
+  height: 24px;
+  width: 24px;
 }
