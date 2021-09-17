@@ -1,44 +1,96 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Icon from "./assets/icon-person.png";
 import "./App.css";
 
 import { useSelector, useDispatch } from "react-redux";
-import { r_set } from "./store";
+import { r_drawline, r_reset, r_set } from "./store";
 
-const Dot = ({ row, col, onDotClick }) => {
-  return <div className="dots" onClick={() => onDotClick(row, col)} />;
+const check = (ogRow, ogCol, row, col) => {
+  if (ogRow === row && ogCol - 1 === col) {
+    return true;
+  } else if (ogRow === row && ogCol + 1 === col) {
+    return true;
+  } else if (ogRow - 1 === row && ogCol === col) {
+    return true;
+  } else if (ogRow + 1 === row && ogCol === col) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
-const Box = ({ visible }) => {
-  if (true) {
-    return null;
-  }
-
+const Dot = ({ row, col, active, onDotClick }) => {
   return (
-    <div className="box">
-      <img className="icon" src={Icon} alt="" />
-    </div>
+    <motion.div
+      className="dots"
+      onClick={() => onDotClick(row, col)}
+      animate={{
+        backgroundColor: [
+          "#4c4c4c",
+          row === active.row && col === active.col ? "#DBA141" : "#4c4c4c",
+        ],
+      }}
+      transition={{ delay: 0, duration: 0.4 }}
+    />
   );
 };
 
-const LineH = ({ data }) => {
+const Box = ({ row, col, matrix }) => {
+  const isBox = () =>
+    matrix[row][col].rightSet &&
+    matrix[row][col].downSet &&
+    matrix[row][col + 1].downSet &&
+    matrix[row + 1][col].rightSet;
+
+  return (
+    <AnimatePresence>
+      {isBox() && (
+        <motion.div
+          key="modal"
+          className="box"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <img className="icon" src={Icon} alt="" />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const LineH = ({ row, col, highlightedLines, isLine }) => {
   return (
     <div className="line-h-wrapper">
       <motion.div
         className="line-h"
-        animate={{ width: data.visible ? 60 : 0 }}
+        animate={{
+          width: isLine
+            ? 60
+            : highlightedLines.includes(JSON.stringify({ row, col, dir: 0 }))
+            ? 60
+            : 0,
+          backgroundColor: ["#eeeeee", isLine ? "#4c4c4c" : "#eeeeee"],
+        }}
         transition={{ delay: 0, duration: 0.4 }}
       />
     </div>
   );
 };
 
-const LineV = ({ data }) => {
+const LineV = ({ row, col, highlightedLines, isLine }) => {
   return (
     <div className="line-v-wrapper">
       <motion.div
-        animate={{ height: data.visible ? 60 : 0 }}
+        animate={{
+          height: isLine
+            ? 60
+            : highlightedLines.includes(JSON.stringify({ row, col, dir: 1 }))
+            ? 60
+            : 0,
+          backgroundColor: ["#eeeeee", isLine ? "#4c4c4c" : "#eeeeee"],
+        }}
         transition={{ delay: 0, duration: 0.4 }}
         className="line-v z-x"
       />
@@ -47,29 +99,55 @@ const LineV = ({ data }) => {
 };
 
 const App = () => {
-  const { rows, cols, matrix } = useSelector((state) => state.global);
+  const { active, rows, cols, matrix, highlightedLines } = useSelector(
+    (state) => state.global
+  );
   const dispatch = useDispatch();
 
   const handleDotClick = (row, col) => {
-    console.log(row, col, matrix[row][col]);
-    dispatch(r_set({ row, col }));
+    if (active.row === row && active.col === col) {
+      return;
+    } else if (check(active.row, active.col, row, col)) {
+      dispatch(r_drawline({ row, col }));
+    } else {
+      dispatch(r_set({ row, col }));
+    }
   };
 
   return (
     <div className="main">
-      <div className="container">
+      <div className="container col">
         {matrix.map((d, i) => (
-          <div key={i} className="col">
+          <div key={i} className="row">
             {d.map((e, j) => (
               <div key={j} className="col">
                 <div className="row align-item-center z-x">
-                  <Dot row={i} col={j} onDotClick={handleDotClick} />
-                  {i < rows - 1 && <LineH data={matrix[i][j]} />}
+                  <Dot
+                    row={i}
+                    col={j}
+                    active={active}
+                    onDotClick={handleDotClick}
+                  />
+                  {j < cols - 1 && (
+                    <LineH
+                      row={i}
+                      col={j}
+                      active={active}
+                      highlightedLines={highlightedLines}
+                      isLine={matrix[i][j].rightSet}
+                    />
+                  )}
                 </div>
-                {j < cols - 1 && (
-                  <div className="row rel">
-                    <LineV data={matrix[i][j]} />
-                    <Box />
+                {i < rows - 1 && (
+                  <div className="col rel">
+                    <LineV
+                      row={i}
+                      col={j}
+                      active={active}
+                      highlightedLines={highlightedLines}
+                      isLine={matrix[i][j].downSet}
+                    />
+                    {j < cols - 1 && <Box row={i} col={j} matrix={matrix} />}
                   </div>
                 )}
               </div>
