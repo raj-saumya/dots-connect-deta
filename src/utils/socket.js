@@ -1,5 +1,6 @@
 import store from "../store";
-import { r_drawline, r_set } from "../store/board";
+import { r_drawline, r_reset, r_set } from "../store/board";
+import { r_setPlayerList, r_setPlayerTurn } from "../store/game";
 
 const socketPath = "ws://localhost:8000/ws/chat/myroom/";
 let active = {
@@ -32,13 +33,23 @@ export default class Socket {
   recieveData() {
     this._socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      const { row, col } = data.message;
-      if (active.row === row && active.col === col) {
-        console.log("same");
-      } else if (check(active.row, active.col, row, col)) {
-        store.dispatch(r_drawline({ row, col }));
-      } else {
-        store.dispatch(r_set({ row, col }));
+      switch (data.message.action) {
+        case "ADD_TO_PLAYER_LIST":
+          store.dispatch(r_setPlayerList(data.message.payload));
+          break;
+        case "BOARD":
+          const { row, col } = data.message.payload;
+          if (active.row === row && active.col === col) {
+            store.dispatch(r_reset());
+          } else if (check(active.row, active.col, row, col)) {
+            store.dispatch(r_drawline({ row, col }));
+            store.dispatch(r_setPlayerTurn());
+          } else {
+            store.dispatch(r_set({ row, col }));
+          }
+          break;
+        default:
+          break;
       }
     };
   }

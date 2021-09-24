@@ -64,12 +64,8 @@ export const globalSlice = createSlice({
     },
     r_reset: (state) => {
       state.highlightedLines = [];
-    },
-    r_socket: (state, action) => {
-      const { row, col } = action.payload;
-      if (state.active.row === row && state.active.col === col) {
-        return;
-      }
+      state.active.row = null;
+      state.active.col = null;
     },
   },
 });

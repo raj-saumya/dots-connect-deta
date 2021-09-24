@@ -2,22 +2,8 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Icon from "../assets/icon-person.png";
 
-import { useSelector, useDispatch } from "react-redux";
-import { r_drawline, r_set } from "../store/board";
-
-const check = (ogRow, ogCol, row, col) => {
-  if (ogRow === row && ogCol - 1 === col) {
-    return true;
-  } else if (ogRow === row && ogCol + 1 === col) {
-    return true;
-  } else if (ogRow - 1 === row && ogCol === col) {
-    return true;
-  } else if (ogRow + 1 === row && ogCol === col) {
-    return true;
-  } else {
-    return false;
-  }
-};
+import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 const Dot = ({ row, col, active, onDotClick }) => {
   return (
@@ -98,30 +84,55 @@ const LineV = ({ row, col, highlightedLines, isLine }) => {
 };
 
 const Board = ({ socket }) => {
+  const history = useHistory();
+
+  const { currentPlayer, playerList, playerTurn } = useSelector(
+    (state) => state.game
+  );
+
   const { active, rows, cols, matrix, highlightedLines } = useSelector(
     (state) => state.global
   );
 
-  const dispatch = useDispatch();
+  if (!currentPlayer) {
+    history.goBack();
+  }
 
   const handleDotClick = (row, col) => {
     socket.sendData({
       message: {
-        row,
-        col,
+        action: "BOARD",
+        payload: {
+          row,
+          col,
+        },
       },
     });
-    // if (active.row === row && active.col === col) {
-    //   return;
-    // } else if (check(active.row, active.col, row, col)) {
-    //   dispatch(r_drawline({ row, col }));
-    // } else {
-    //   dispatch(r_set({ row, col }));
-    // }
   };
 
   return (
     <div className="main">
+      {playerTurn === currentPlayer && (
+        <div
+          style={{
+            position: "absolute",
+            height: "100%",
+            background: "transparent",
+            width: "100%",
+            zIndex: "99",
+          }}
+        ></div>
+      )}
+      <div style={{ position: "absolute" }}>
+        <div>Player : {currentPlayer}</div>
+        <div>
+          Player List :{" "}
+          {playerList.map((player, i) => (
+            <label key={i}>- {player} - </label>
+          ))}
+        </div>
+      </div>
+
       <div className="container col">
         {matrix.map((d, i) => (
           <div key={i} className="row">
