@@ -2,7 +2,7 @@ import store from "../store";
 import { r_drawline, r_reset, r_set } from "../store/board";
 import { r_setPlayerList, r_setPlayerTurn } from "../store/game";
 
-const socketPath = "ws://localhost:8000/ws/chat/myroom/";
+const socketPath = "ws://localhost:8000/ws/chat/";
 let active = {
   row: null,
   col: null,
@@ -13,9 +13,9 @@ const unsubscribe = store.subscribe(() => {
 });
 
 export default class Socket {
-  establishConnection() {
+  establishConnection(roomId) {
     return new Promise((resolve, reject) => {
-      this._socket = new WebSocket(socketPath);
+      this._socket = new WebSocket(`${socketPath}51ed5dd6-4e11-48c9-ae7c-b7a73c2f6095/`);
       this._socket.onopen = () => resolve("success");
       this._socket.onerror = (err) => reject(err);
     });

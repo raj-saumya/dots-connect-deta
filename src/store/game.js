@@ -4,6 +4,7 @@ const initialState = {
   currentPlayer: "",
   playerList: [],
   playerTurn: "",
+  totalMoves: 0,
 };
 
 const gameSlice = createSlice({
@@ -12,6 +13,7 @@ const gameSlice = createSlice({
   reducers: {
     r_setCurrentPlayer: (state, action) => {
       state.currentPlayer = action.payload;
+      state.playerTurn = state.playerList[state.totalMoves];
     },
     r_setPlayerList: (state, action) => {
       if (!state.playerList.length) {
@@ -20,9 +22,8 @@ const gameSlice = createSlice({
       state.playerList.push(action.payload);
     },
     r_setPlayerTurn: (state) => {
-      state.playerTurn = state.playerList.filter(
-        (d) => d !== state.playerTurn
-      )[0];
+      state.totalMoves = (state.totalMoves + 1) % state.playerList.length;
+      state.playerTurn = state.playerList[state.totalMoves];
     },
   },
 });

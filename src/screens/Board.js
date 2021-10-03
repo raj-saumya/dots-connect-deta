@@ -95,7 +95,7 @@ const Board = ({ socket }) => {
   );
 
   if (!currentPlayer) {
-    history.goBack();
+    history.push("./");
   }
 
   const handleDotClick = (row, col) => {
@@ -112,7 +112,7 @@ const Board = ({ socket }) => {
 
   return (
     <div className="main">
-      {playerTurn === currentPlayer && (
+      {playerTurn !== currentPlayer && (
         <div
           style={{
             position: "absolute",
